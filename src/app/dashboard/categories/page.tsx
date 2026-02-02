@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 import { MdAdd, MdEdit, MdDelete, MdSearch, MdCategory } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 interface Category {
   _id: string;
@@ -88,16 +89,19 @@ export default function CategoriesPage() {
           payload,
           config
         );
+        toast.success("Category updated successfully");
       } else {
         await axios.post("http://localhost:5000/api/categories", payload, config);
+        toast.success("Category created successfully");
       }
 
       setIsModalOpen(false);
       resetForm();
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving category", error);
-      alert("Error saving category");
+      const errorMessage = error.response?.data?.message || "Error saving category";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,9 +113,12 @@ export default function CategoriesPage() {
       await axios.delete(`http://localhost:5000/api/categories/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
+      toast.success("Category deleted successfully");
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting category", error);
+      const errorMessage = error.response?.data?.message || "Error deleting category";
+      toast.error(errorMessage);
     }
   };
 

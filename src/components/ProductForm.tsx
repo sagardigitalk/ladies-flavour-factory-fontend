@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { MdCloudUpload, MdAutorenew, MdSave } from "react-icons/md";
 import { Card } from "@/components/ui/Card";
+import { toast } from "react-hot-toast";
 
 interface Category {
   _id: string;
@@ -134,14 +135,17 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
           data,
           config
         );
+        toast.success("Product updated successfully!");
       } else {
         await axios.post("http://localhost:5000/api/products", data, config);
+        toast.success("Product created successfully!");
       }
 
       router.push("/dashboard/products");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving product", error);
-      alert("Error saving product");
+      const errorMessage = error.response?.data?.message || "Error saving product";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

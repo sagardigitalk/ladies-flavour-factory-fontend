@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { MdAdd, MdEdit, MdDelete, MdQrCode, MdSearch, MdFilterList, MdShoppingBag } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 interface Product {
   _id: string;
@@ -83,9 +84,12 @@ export default function ProductsPage() {
       await axios.delete(`http://localhost:5000/api/products/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
+      toast.success("Product deleted successfully");
       fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting product", error);
+      const errorMessage = error.response?.data?.message || "Error deleting product";
+      toast.error(errorMessage);
     }
   };
 

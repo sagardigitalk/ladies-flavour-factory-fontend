@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { MdAdd, MdEdit, MdDelete, MdSecurity, MdCheckCircle, MdCancel } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 interface Role {
   _id: string;
@@ -86,16 +87,19 @@ export default function RolesPage() {
           payload,
           config
         );
+        toast.success("Role updated successfully");
       } else {
         await axios.post("http://localhost:5000/api/roles", payload, config);
+        toast.success("Role created successfully");
       }
 
       setIsModalOpen(false);
       resetForm();
       fetchRoles();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving role", error);
-      alert("Error saving role");
+      const errorMessage = error.response?.data?.message || "Error saving role";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -107,9 +111,12 @@ export default function RolesPage() {
       await axios.delete(`http://localhost:5000/api/roles/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
+      toast.success("Role deleted successfully");
       fetchRoles();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting role", error);
+      const errorMessage = error.response?.data?.message || "Error deleting role";
+      toast.error(errorMessage);
     }
   };
 

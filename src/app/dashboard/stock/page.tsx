@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
 import { MdAdd, MdInventory } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 interface StockTransaction {
   _id: string;
@@ -87,13 +88,15 @@ export default function StockPage() {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
       );
+      toast.success("Stock transaction added successfully");
 
       setIsModalOpen(false);
       resetForm();
       fetchTransactions();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding stock entry", error);
-      alert("Error adding stock entry");
+      const errorMessage = error.response?.data?.message || "Error adding stock entry";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

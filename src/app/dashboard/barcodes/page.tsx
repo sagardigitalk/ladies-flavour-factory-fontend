@@ -78,6 +78,7 @@ export default function BarcodesPage() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
+    onAfterPrint: () => toast.success("Print dialog opened"),
   });
 
   return (

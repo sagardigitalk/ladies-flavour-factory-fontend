@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { MdAdd, MdEdit, MdDelete, MdPerson, MdEmail, MdSearch, MdSecurity } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 interface Role {
     _id: string;
@@ -107,8 +108,10 @@ export default function UsersPage() {
           payload,
           config
         );
+        toast.success("User updated successfully");
       } else {
         await axios.post("http://localhost:5000/api/users", payload, config);
+        toast.success("User created successfully");
       }
 
       setIsModalOpen(false);
@@ -116,9 +119,10 @@ export default function UsersPage() {
       // Only refetch users, no need to refetch roles usually
       const { data } = await axios.get("http://localhost:5000/api/users", config);
       setUsers(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving user", error);
-      alert("Error saving user");
+      const errorMessage = error.response?.data?.message || "Error saving user";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,12 +134,15 @@ export default function UsersPage() {
       await axios.delete(`http://localhost:5000/api/users/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
+      toast.success("User deleted successfully");
       const { data } = await axios.get("http://localhost:5000/api/users", {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setUsers(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting user", error);
+      const errorMessage = error.response?.data?.message || "Error deleting user";
+      toast.error(errorMessage);
     }
   };
 

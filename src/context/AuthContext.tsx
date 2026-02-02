@@ -25,6 +25,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   hasPermission: (permission: string) => boolean;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,13 +69,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push("/login");
   };
 
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
   const hasPermission = (permission: string): boolean => {
     if (!user || !user.role || !user.role.permissions) return false;
     return user.role.permissions.includes(permission);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, hasPermission }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading, hasPermission, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
