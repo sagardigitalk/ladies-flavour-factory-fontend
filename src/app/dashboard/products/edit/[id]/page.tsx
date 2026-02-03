@@ -17,10 +17,10 @@ export default function EditProductPage() {
     const fetchProduct = async () => {
       try {
         const data = await productService.getProduct(id as string);
-        // Transform category object to ID string for form
+        // Transform catalog object to ID string for form
         const transformedData = {
           ...data,
-          category: data.category?._id || "",
+          catalog: data.catalog?._id || "",
         };
         setProduct(transformedData);
       } catch (error) {

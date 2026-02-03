@@ -12,18 +12,18 @@ import { Input } from "@/components/ui/Input";
 import { MdAdd, MdEdit, MdDelete, MdQrCode, MdSearch, MdFilterList, MdShoppingBag } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { productService } from "@/services/productService";
-import { categoryService } from "@/services/categoryService";
+import { catalogService } from "@/services/catalogService";
 
 interface Product {
   _id: string;
   name: string;
   sku: string;
-  category: { _id: string; name: string };
+  catalog: { _id: string; name: string };
   stockQuantity: number;
   unitPrice: number;
 }
 
-interface Category {
+interface Catalog {
   _id: string;
   name: string;
 }
@@ -31,12 +31,12 @@ interface Category {
 export default function ProductsPage() {
   const { user, hasPermission } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filters
   const [keyword, setKeyword] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCatalog, setSelectedCatalog] = useState("");
   
   // Barcode
   const [selectedProductSku, setSelectedProductSku] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function ProductsPage() {
     try {
       const params: any = {};
       if (keyword) params.keyword = keyword;
-      if (selectedCategory) params.category = selectedCategory;
+      if (selectedCatalog) params.catalog = selectedCatalog;
 
       const data = await productService.getProducts(params);
       setProducts(data.products);
@@ -57,23 +57,23 @@ export default function ProductsPage() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCatalogs = async () => {
     try {
-      const data = await categoryService.getCategories();
-      setCategories(data);
+      const data = await catalogService.getCatalogs();
+      setCatalogs(data);
     } catch (error) {
-      console.error("Error fetching categories", error);
+      console.error("Error fetching catalogs", error);
     }
   };
 
   useEffect(() => {
     if (user && hasPermission('view_products')) {
-      fetchCategories();
+      fetchCatalogs();
       fetchProducts();
     } else {
         setIsLoading(false);
     }
-  }, [user, keyword, selectedCategory]);
+  }, [user, keyword, selectedCatalog]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -139,12 +139,12 @@ export default function ProductsPage() {
           <div className="relative min-w-[200px]">
             <MdFilterList className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={selectedCatalog}
+              onChange={(e) => setSelectedCatalog(e.target.value)}
               className="w-full pl-10 pr-4 py-2 h-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white text-sm"
             >
               <option value="">All Categories</option>
-              {categories.map((c) => (
+              {catalogs.map((c) => (
                 <option key={c._id} value={c._id}>
                   {c.name}
                 </option>
@@ -192,7 +192,7 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-600">
-                          {product.category?.name || "Uncategorized"}
+                          {product.catalog?.name || "Uncategorized"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

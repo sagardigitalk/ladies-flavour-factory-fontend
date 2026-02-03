@@ -9,46 +9,44 @@ import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 import { MdAdd, MdEdit, MdDelete, MdSearch, MdCategory } from "react-icons/md";
 import { toast } from "react-hot-toast";
-import { categoryService } from "@/services/categoryService";
+import { catalogService } from "@/services/catalogService";
 
 
-interface Category {
+interface Catalog {
   _id: string;
   name: string;
   code: string;
-  description: string;
 }
 
-export default function CategoriesPage() {
+export default function CatalogPage() {
   const { user, hasPermission } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+  const [filteredCatalogs, setFilteredCatalogs] = useState<Catalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCatalog, setEditingCatalog] = useState<Catalog | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Form State
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchCategories = async () => {
+  const fetchCatalogs = async () => {
     try {
-      const data = await categoryService.getCategories();
-      setCategories(data);
-      setFilteredCategories(data);
+      const data = await catalogService.getCatalogs();
+      setCatalogs(data);
+      setFilteredCatalogs(data);
     } catch (error) {
-      console.error("Error fetching categories", error);
+      console.error("Error fetching catalogs", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user && hasPermission('view_categories')) {
-      fetchCategories();
+    if (user && hasPermission('view_catalog')) {
+      fetchCatalogs();
     } else {
         setIsLoading(false);
     }
@@ -57,16 +55,16 @@ export default function CategoriesPage() {
   useEffect(() => {
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      const filtered = categories.filter(
+      const filtered = catalogs.filter(
         (c) =>
           c.name.toLowerCase().includes(lowerQuery) ||
           c.code.toLowerCase().includes(lowerQuery)
       );
-      setFilteredCategories(filtered);
+      setFilteredCatalogs(filtered);
     } else {
-      setFilteredCategories(categories);
+      setFilteredCatalogs(catalogs);
     }
-  }, [searchQuery, categories]);
+  }, [searchQuery, catalogs]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,23 +73,22 @@ export default function CategoriesPage() {
       const payload = {
         name,
         code,
-        description,
       };
 
-      if (editingCategory) {
-        await categoryService.updateCategory(editingCategory._id, payload);
-        toast.success("Category updated successfully");
+      if (editingCatalog) {
+        await catalogService.updateCatalog(editingCatalog._id, payload);
+        toast.success("Catalog updated successfully");
       } else {
-        await categoryService.createCategory(payload);
-        toast.success("Category created successfully");
+        await catalogService.createCatalog(payload);
+        toast.success("Catalog created successfully");
       }
 
       setIsModalOpen(false);
       resetForm();
-      fetchCategories();
+      fetchCatalogs();
     } catch (error: any) {
-      console.error("Error saving category", error);
-      const errorMessage = error.response?.data?.message || "Error saving category";
+      console.error("Error saving catalog", error);
+      const errorMessage = error.response?.data?.message || "Error saving catalog";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -99,40 +96,38 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
+    if (!confirm("Are you sure you want to delete this catalog?")) return;
     try {
-      await categoryService.deleteCategory(id);
-      toast.success("Category deleted successfully");
-      fetchCategories();
+      await catalogService.deleteCatalog(id);
+      toast.success("Catalog deleted successfully");
+      fetchCatalogs();
     } catch (error: any) {
-      console.error("Error deleting category", error);
-      const errorMessage = error.response?.data?.message || "Error deleting category";
+      console.error("Error deleting catalog", error);
+      const errorMessage = error.response?.data?.message || "Error deleting catalog";
       toast.error(errorMessage);
     }
   };
 
-  const openEditModal = (category: Category) => {
-    setEditingCategory(category);
-    setName(category.name);
-    setCode(category.code);
-    setDescription(category.description || "");
+  const openEditModal = (catalog: Catalog) => {
+    setEditingCatalog(catalog);
+    setName(catalog.name);
+    setCode(catalog.code);
     setIsModalOpen(true);
   };
 
   const resetForm = () => {
-    setEditingCategory(null);
+    setEditingCatalog(null);
     setName("");
     setCode("");
-    setDescription("");
   };
 
-  if (!hasPermission('view_categories')) {
+  if (!hasPermission('view_catalog')) {
     return (
       <div className="p-8 flex items-center justify-center h-full">
           <Card className="w-full max-w-md text-center p-8">
               <MdCategory className="w-16 h-16 mx-auto text-red-500 mb-4" />
               <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
-              <p className="text-gray-600">You do not have permission to view categories.</p>
+              <p className="text-gray-600">You do not have permission to view catalogs.</p>
           </Card>
       </div>
     );
@@ -143,10 +138,10 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Category Master</h2>
-          <p className="text-gray-500 mt-1">Manage your product categories</p>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Catalog Master</h2>
+          <p className="text-gray-500 mt-1">Manage your product catalogs</p>
         </div>
-        {hasPermission('manage_categories') && (
+        {hasPermission('manage_catalog') && (
             <Button
             onClick={() => {
                 resetForm();
@@ -155,7 +150,7 @@ export default function CategoriesPage() {
             className="flex items-center gap-2"
             >
             <MdAdd className="w-5 h-5" />
-            Add Category
+            Add Catalog
             </Button>
         )}
       </div>
@@ -165,7 +160,7 @@ export default function CategoriesPage() {
         <div className="relative flex-1 max-w-md">
           <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
-            placeholder="Search categories..."
+            placeholder="Search catalogs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -181,43 +176,41 @@ export default function CategoriesPage() {
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
                 <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                     </div>
                   </td>
                 </tr>
-              ) : filteredCategories.length === 0 ? (
+              ) : filteredCatalogs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                    No categories found
+                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                    No catalogs found
                   </td>
                 </tr>
               ) : (
-                filteredCategories.map((category) => (
-                  <tr key={category._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{category.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{category.code}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.description}</td>
+                filteredCatalogs.map((catalog) => (
+                  <tr key={catalog._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{catalog.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{catalog.code}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      {hasPermission('manage_categories') && (
+                      {hasPermission('manage_catalog') && (
                         <div className="flex justify-end gap-2">
                           <button
-                            onClick={() => openEditModal(category)}
+                            onClick={() => openEditModal(catalog)}
                             className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
                             title="Edit"
                           >
                             <MdEdit className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={() => handleDelete(category._id)}
+                            onClick={() => handleDelete(catalog._id)}
                             className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
@@ -237,7 +230,7 @@ export default function CategoriesPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingCategory ? "Edit Category" : "Add New Category"}
+        title={editingCatalog ? "Edit Catalog" : "Add New Catalog"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -254,12 +247,6 @@ export default function CategoriesPage() {
             required
             placeholder="e.g. CAT001"
           />
-          <Textarea
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Category description..."
-          />
           <div className="flex justify-end gap-3 mt-6">
             <Button
               type="button"
@@ -272,7 +259,7 @@ export default function CategoriesPage() {
               type="submit"
               isLoading={isSubmitting}
             >
-              {editingCategory ? "Update Category" : "Create Category"}
+              {editingCatalog ? "Update Catalog" : "Create Catalog"}
             </Button>
           </div>
         </form>

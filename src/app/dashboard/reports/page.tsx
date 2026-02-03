@@ -16,7 +16,7 @@ interface Product {
   _id: string;
   name: string;
   sku: string;
-  category: { name: string };
+  catalog: { name: string };
   stockQuantity: number;
   unitPrice: number;
   costPrice: number;
@@ -51,7 +51,7 @@ export default function ReportsPage() {
       products.map((p) => ({
         Name: p.name,
         SKU: p.sku,
-        Category: p.category?.name || "-",
+        Catalog: p.catalog?.name || "-",
         "Stock Quantity": p.stockQuantity,
         "Unit Price": p.unitPrice,
         "Cost Price": p.costPrice,
@@ -70,7 +70,7 @@ export default function ReportsPage() {
     const tableData = products.map((p) => [
       p.name,
       p.sku,
-      p.category?.name || "-",
+      p.catalog?.name || "-",
       p.stockQuantity,
       p.unitPrice,
       (p.stockQuantity * p.costPrice).toFixed(2),
@@ -182,7 +182,7 @@ export default function ReportsPage() {
                     <tr key={p._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{p.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.sku}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.category?.name || "-"}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.catalog?.name || "-"}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {p.stockQuantity < 10 ? (
                             <Badge variant="warning">{p.stockQuantity}</Badge>

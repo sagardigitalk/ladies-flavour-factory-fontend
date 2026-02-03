@@ -11,9 +11,9 @@ import { MdCloudUpload, MdAutorenew, MdSave } from "react-icons/md";
 import { Card } from "@/components/ui/Card";
 import { toast } from "react-hot-toast";
 import { productService } from "@/services/productService";
-import { categoryService } from "@/services/categoryService";
+import { catalogService } from "@/services/catalogService";
 
-interface Category {
+interface Catalog {
   _id: string;
   name: string;
 }
@@ -21,7 +21,7 @@ interface Category {
 interface ProductFormData {
   name: string;
   sku: string;
-  category: string;
+  catalog: string;
   description: string;
   images: string[];
   unitPrice: number;
@@ -37,13 +37,13 @@ interface ProductFormProps {
 export default function ProductForm({ initialData, isEdit = false }: ProductFormProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     sku: "",
-    category: "",
+    catalog: "",
     description: "",
     images: [],
     unitPrice: 0,
@@ -58,7 +58,7 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
       setFormData({
         name: initialData.name || "",
         sku: initialData.sku || "",
-        category: initialData.category || "",
+        catalog: initialData.catalog || "",
         description: initialData.description || "",
         images: initialData.images || [],
         unitPrice: initialData.unitPrice || 0,
@@ -69,17 +69,17 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
   }, [initialData]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchCatalogs = async () => {
       try {
-        const data = await categoryService.getCategories();
-        setCategories(data);
+        const data = await catalogService.getCatalogs();
+        setCatalogs(data);
       } catch (error) {
-        console.error("Error fetching categories", error);
+        console.error("Error fetching catalogs", error);
       }
     };
 
     if (user) {
-      fetchCategories();
+      fetchCatalogs();
     }
   }, [user]);
 
@@ -112,7 +112,7 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
       const data = new FormData();
       data.append('name', formData.name);
       data.append('sku', formData.sku);
-      data.append('category', formData.category);
+      data.append('catalog', formData.catalog);
       data.append('description', formData.description);
       data.append('unitPrice', String(formData.unitPrice));
       data.append('costPrice', String(formData.costPrice));
@@ -178,16 +178,16 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Catalog</label>
                   <select
-                    name="category"
-                    value={formData.category}
+                    name="catalog"
+                    value={formData.catalog}
                     onChange={handleChange}
                     className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
                     required
                   >
-                    <option value="">Select Category</option>
-                    {categories.map((cat) => (
+                    <option value="">Select Catalog</option>
+                    {catalogs.map((cat) => (
                       <option key={cat._id} value={cat._id}>
                         {cat.name}
                       </option>

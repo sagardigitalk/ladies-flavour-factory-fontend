@@ -27,7 +27,7 @@ export default function Sidebar() {
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: MdDashboard, permission: "view_dashboard" },
-    { name: "Categories", href: "/dashboard/categories", icon: MdCategory, permission: "view_categories" },
+    { name: "Catalog", href: "/dashboard/catalog", icon: MdCategory, permission: "view_catalog" },
     { name: "Products", href: "/dashboard/products", icon: MdShoppingBag, permission: "view_products" },
     { name: "Stock", href: "/dashboard/stock", icon: MdInventory, permission: "manage_stock" },
     { name: "Barcodes", href: "/dashboard/barcodes", icon: MdQrCode, permission: "view_barcodes" },

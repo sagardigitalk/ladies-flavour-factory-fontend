@@ -37,8 +37,8 @@ const AVAILABLE_PERMISSIONS = [
   { id: 'delete_product', label: 'Delete Product' },
   { id: 'manage_stock', label: 'Manage Stock' },
   { id: 'view_reports', label: 'View Reports' },
-  { id: 'view_categories', label: 'View Categories' },
-  { id: 'manage_categories', label: 'Manage Categories' },
+  { id: 'view_catalog', label: 'View Catalog' },
+  { id: 'manage_catalog', label: 'Manage Catalog' },
   { id: 'view_barcodes', label: 'View Barcodes' },
 ];
 
