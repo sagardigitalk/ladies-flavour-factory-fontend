@@ -121,19 +121,11 @@ export default function RolesPage() {
         permissions: selectedPermissions,
       };
 
-      const config = {
-        headers: { Authorization: `Bearer ${user?.token}` },
-      };
-
       if (editingRole) {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/roles${editingRole._id}`,
-          payload,
-          config
-        );
+        await roleService.updateRole(editingRole._id, payload);
         toast.success("Role updated successfully");
       } else {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/roles`, payload, config);
+        await roleService.createRole(payload);
         toast.success("Role created successfully");
       }
 

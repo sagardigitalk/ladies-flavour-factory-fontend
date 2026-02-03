@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { userService } from "@/services/userService";
 
 export interface Role {
   _id: string;
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/users/login`, {
+      const data = await userService.login({
         email, 
         password,
       });

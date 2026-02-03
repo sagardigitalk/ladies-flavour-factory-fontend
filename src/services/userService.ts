@@ -29,5 +29,10 @@ export const userService = {
   updateProfile: async (profileData: any) => {
     const { data } = await api.put('/users/profile', profileData);
     return data;
+  },
+
+  login: async (credentials: any) => {
+    const { data } = await api.post('/users/login', credentials);
+    return data;
   }
 };
