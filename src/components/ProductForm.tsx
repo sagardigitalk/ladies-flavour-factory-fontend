@@ -97,6 +97,47 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
     }
   };
 
+  const handleCatalogChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCatalogId = e.target.value;
+    const newCatalog = catalogs.find(c => c._id === newCatalogId);
+    
+    setFormData(prev => {
+        const oldCatalog = catalogs.find(c => c._id === prev.catalog);
+        let currentName = prev.name;
+        
+        // Remove old prefix if present
+        if (oldCatalog) {
+            const oldPrefix = `${oldCatalog.name}-`;
+            if (currentName.startsWith(oldPrefix)) {
+                currentName = currentName.substring(oldPrefix.length);
+            }
+        }
+        
+        // Add new prefix if new catalog is selected
+        if (newCatalog) {
+            currentName = `${newCatalog.name}-${currentName}`;
+        }
+        
+        return {
+            ...prev,
+            catalog: newCatalogId,
+            name: currentName
+        };
+    });
+  };
+
+  const selectedCatalog = catalogs.find(c => c._id === formData.catalog);
+  const prefix = selectedCatalog ? `${selectedCatalog.name}-` : "";
+  const nameSuffix = formData.name.startsWith(prefix) ? formData.name.slice(prefix.length) : formData.name;
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newSuffix = e.target.value;
+      setFormData(prev => ({
+          ...prev,
+          name: prefix + newSuffix
+      }));
+  };
+
   const generateSku = () => {
     const prefix = formData.name ? formData.name.substring(0, 3).toUpperCase() : "PROD";
     const random = Math.floor(1000 + Math.random() * 9000);
@@ -148,52 +189,72 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
             <div className="space-y-4">
-              <Input
-                label="Product Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                placeholder="e.g. Summer Dress"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Catalog</label>
+                <select
+                  name="catalog"
+                  value={formData.catalog}
+                  onChange={handleCatalogChange}
+                  className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  required
+                >
+                  <option value="">Select Catalog</option>
+                  {catalogs.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                  {prefix ? (
+                      <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 bg-white">
+                        <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm bg-gray-50 rounded-l-md border-r border-gray-300 px-3">
+                            {prefix}
+                        </span>
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            className="block flex-1 border-0 bg-transparent py-2 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 focus:outline-none h-10"
+                            placeholder="e.g. Summer Dress"
+                            value={nameSuffix}
+                            onChange={handleNameChange}
+                            required
+                        />
+                      </div>
+                  ) : (
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                        required
+                        placeholder="e.g. Summer Dress"
+                    />
+                  )}
+              </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                  <Input
-                    label="SKU (Stock Keeping Unit)"
-                    name="sku"
-                    value={formData.sku}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g. SUM-1234"
-                  />
-                  <button
-                    type="button"
-                    onClick={generateSku}
-                    className="absolute right-2 top-[30px] text-gray-400 hover:text-indigo-600 p-1"
-                    title="Auto-generate SKU"
-                  >
-                    <MdAutorenew className="w-5 h-5" />
-                  </button>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Catalog</label>
-                  <select
-                    name="catalog"
-                    value={formData.catalog}
-                    onChange={handleChange}
-                    className="w-full h-10 px-3 py-2 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                    required
-                  >
-                    <option value="">Select Catalog</option>
-                    {catalogs.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="relative">
+                <Input
+                  label="SKU (Stock Keeping Unit)"
+                  name="sku"
+                  value={formData.sku}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. SUM-1234"
+                />
+                <button
+                  type="button"
+                  onClick={generateSku}
+                  className="absolute right-2 top-[30px] text-gray-400 hover:text-indigo-600 p-1"
+                  title="Auto-generate SKU"
+                >
+                  <MdAutorenew className="w-5 h-5" />
+                </button>
               </div>
 
               <Textarea
@@ -203,41 +264,6 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
                 onChange={handleChange}
                 rows={4}
                 placeholder="Product description..."
-              />
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing & Inventory</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="Unit Price ($)"
-                name="unitPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.unitPrice}
-                onChange={handleChange}
-                required
-              />
-              <Input
-                label="Cost Price ($)"
-                name="costPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.costPrice}
-                onChange={handleChange}
-                required
-              />
-              <Input
-                label="Initial Stock"
-                name="stockQuantity"
-                type="number"
-                min="0"
-                value={formData.stockQuantity}
-                onChange={handleChange}
-                required
               />
             </div>
           </Card>

@@ -143,7 +143,7 @@ export default function ProductsPage() {
               onChange={(e) => setSelectedCatalog(e.target.value)}
               className="w-full pl-10 pr-4 py-2 h-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white text-sm"
             >
-              <option value="">All Categories</option>
+              <option value="">All Catalogs</option>
               {catalogs.map((c) => (
                 <option key={c._id} value={c._id}>
                   {c.name}
@@ -159,9 +159,9 @@ export default function ProductsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Info</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Catalog</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Name</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">SKU</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -185,20 +185,15 @@ export default function ProductsPage() {
                   products.map((product) => (
                     <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-gray-900">{product.name}</span>
-                          <span className="text-xs text-gray-500">SKU: {product.sku}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-600">
                           {product.catalog?.name || "Uncategorized"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">
-                          ${product.unitPrice.toFixed(2)}
-                        </span>
+                        <span className="text-sm font-medium text-gray-900">{product.name}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-xs text-gray-500">{product.sku}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge variant={getStockStatus(product.stockQuantity)}>
@@ -207,7 +202,7 @@ export default function ProductsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end gap-2">
-                          {hasPermission('view_barcodes') && (
+                          {/* {hasPermission('view_barcodes') && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -220,7 +215,7 @@ export default function ProductsPage() {
                             >
                                 <MdQrCode className="w-4 h-4" />
                             </Button>
-                          )}
+                          )} */}
                           {hasPermission('edit_product') && (
                             <Link href={`/dashboard/products/edit/${product._id}`}>
                                 <Button
