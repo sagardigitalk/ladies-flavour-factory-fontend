@@ -280,16 +280,29 @@ export default function ProductForm({ initialData, isEdit = false }: ProductForm
                     <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
                   </label>
                 </div>
-
                 {/* Preview Section */}
-                {(file || (formData.images && formData.images.length > 0)) && (
-                  <div className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full max-w-[200px] mx-auto">
+                {(file || formData.images?.length > 0) && (
+                  <div className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 w-full max-w-[240px] mx-auto">
                     <img
-                      src={file ? URL.createObjectURL(file) : `${process.env.NEXT_PUBLIC_API_URL}/api/${formData.images[0]}`}
-                      alt="Product Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/150")}
+                      src={
+                        file
+                          ? URL.createObjectURL(file)
+                          : formData.images?.[0]
+                            ? `${process.env.NEXT_PUBLIC_API_URL}/${formData.images[0]}`
+                            : "https://via.placeholder.com/240?text=Preview+Not+Available"
+                      }
+                      alt="Product preview"
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/240?text=Image+Error";
+                        e.currentTarget.onerror = null; // prevent infinite loop
+                      }}
                     />
+                    {file && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-white text-sm font-medium">New upload</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
