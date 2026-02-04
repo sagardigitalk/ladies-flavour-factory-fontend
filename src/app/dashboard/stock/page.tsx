@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
-import { MdAdd, MdInventory, MdSearch, MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { MdAdd, MdInventory, MdSearch, MdChevronLeft, MdChevronRight, MdClear } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import { stockService } from "@/services/stockService";
 import { productService } from "@/services/productService";
@@ -44,6 +44,8 @@ export default function StockPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
@@ -62,7 +64,9 @@ export default function StockPage() {
         page,
         limit: 10,
         search: debouncedSearch,
-        type: activeTab
+        type: activeTab,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined
       });
       setTransactions(data.transactions || []);
       setTotalPages(data.pages || 1);
@@ -96,7 +100,7 @@ export default function StockPage() {
     if (user) {
       fetchTransactions();
     }
-  }, [user, page, debouncedSearch, activeTab]);
+  }, [user, page, debouncedSearch, activeTab, startDate, endDate]);
 
   useEffect(() => {
     if (user) {
@@ -135,6 +139,13 @@ export default function StockPage() {
     setReason("");
   };
 
+  const handleClear = () => {
+    setSearchQuery("");
+    setStartDate("");
+    setEndDate("");
+    setPage(1);
+  };
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'IN': return 'success';
@@ -161,16 +172,45 @@ export default function StockPage() {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div className="relative flex-1">
           <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             placeholder="Search stock transactions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 w-full"
           />
         </div>
+        <div className="flex gap-2 items-center">
+            <span className="text-sm text-gray-500 whitespace-nowrap">From:</span>
+            <Input 
+                type="date" 
+                value={startDate} 
+                onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+                className="w-full md:w-auto"
+            />
+        </div>
+        <div className="flex gap-2 items-center">
+            <span className="text-sm text-gray-500 whitespace-nowrap">To:</span>
+            <Input 
+                type="date" 
+                value={endDate} 
+                onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+                className="w-full md:w-auto"
+            />
+        </div>
+        
+        {(searchQuery || startDate || endDate) && (
+          <Button 
+            variant="outline" 
+            onClick={handleClear}
+            className="flex items-center gap-2 whitespace-nowrap"
+          >
+            <MdClear className="w-4 h-4" />
+            Clear
+          </Button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -204,6 +244,7 @@ export default function StockPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50/50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catalog</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
@@ -228,6 +269,9 @@ export default function StockPage() {
               ) : (
                 transactions.map((tx) => (
                   <tr key={tx._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(tx.createdAt).toLocaleDateString()} {new Date(tx.createdAt).toLocaleTimeString()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {tx.product?.catalog?.name || '-'}
                     </td>

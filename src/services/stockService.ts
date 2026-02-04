@@ -1,7 +1,14 @@
 import api from './api';
 
 export const stockService = {
-  getTransactions: async (params?: { page?: number; limit?: number; search?: string; type?: string }) => {
+  getTransactions: async (params?: { 
+    page?: number; 
+    limit?: number; 
+    search?: string; 
+    type?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => {
     const { data } = await api.get('/stock', { params });
     return data;
   },
